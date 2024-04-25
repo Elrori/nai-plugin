@@ -87,7 +87,7 @@ class TaskQueue extends EventEmitter {
                 { message: { ...image, origin: true } }
             ]))
         } else {
-            await e.reply(message);
+            //await e.reply(message);
             await e.reply([{ ...image, origin: true },
             segment.button([{ text: '再来一张', callback: e.msg }])
             ]);

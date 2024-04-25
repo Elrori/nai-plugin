@@ -73,7 +73,7 @@ const headers = {
 
 const defaultParam = {
   "txt2img": {
-    "input": "miku", // 正向提示词
+    "input": "1girl,[[toddler]],[artist:ciloranko], [artist:tianliang duohe fangdongye], [artist:sho_(sho_lwlw)], [artist:baku-p], [artist:tsubasa_tsubasa],reverse light,golden hour lighting, full body,", // 正向提示词
     "model": "nai-diffusion-3", // 模型
     "action": "generate", // 动作
     "parameters": {
@@ -103,7 +103,7 @@ const defaultParam = {
     }
   },
   "img2img": {
-    "input": "miku",
+    "input": "1girl,[[toddler]],[artist:ciloranko], [artist:tianliang duohe fangdongye], [artist:sho_(sho_lwlw)], [artist:baku-p], [artist:tsubasa_tsubasa],reverse light,golden hour lighting, full body,",
     "model": "nai-diffusion-3",
     "action": "img2img",
     "parameters": {
