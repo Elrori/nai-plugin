@@ -1,6 +1,10 @@
 import plugin from '../../../lib/plugins/plugin.js'
 import { txt2img } from './Txt2img.js'
 import { img2img } from './Img2img.js'
+import {
+  readYaml,
+  Config_yaml
+} from '../utils/paimonNaiControl.js'
 
 export class again extends plugin {
     constructor() {
@@ -15,7 +19,7 @@ export class again extends plugin {
             rule: [
                 {
                     /** 命令正则匹配 */
-                    reg: '^(/|#)重画$',
+                    reg: '^(/|#|r)(重画|e)([0-9]|)$',
                     /** 执行方法 */
                     fnc: 'again'
                 }
@@ -24,6 +28,21 @@ export class again extends plugin {
     }
 
     async again(e) {
+    
+        // re feature-----------------------------------------
+        let input_v = e.msg.replace(/^#重画|re/, '').trim()
+        let input_num = parseInt(input_v)
+        let renums = 1
+        if (input_num && input_num <= 3 && input_num > 0) {
+            renums = input_num
+        }
+        e.renums = renums
+        // paimon_nai_turnOn
+        let config_yaml = readYaml(Config_yaml)
+        if (!config_yaml) logger.error('无法读取config_yaml')
+        if (!config_yaml.paimon_nai_turnOn) return
+        // re feature end-------------------------------------
+        
         const usageData = await redis.get(`nai:again:${e.user_id}`);
         if (!usageData) {
             e.reply("太久远了，我也忘记上一次绘的图是什么了");

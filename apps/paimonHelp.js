@@ -21,75 +21,70 @@ export class paimonnaihelp extends plugin {
             priority: 999,
             rule: [
                 {
-                    reg: '^#派蒙nai帮助',
+                    reg: '^(/|#)派蒙nai帮助',
                     fnc: 'paimon_nai_help',
                 },
                 {
-                    reg: '^#派蒙nai设置使用接口',
+                    reg: '^(/|#)派蒙nai设置使用接口',
                     fnc: 'paimon_nai_set_use_token',
                     permission: 'master'
                 },
                 {
-                    reg: '^#派蒙nai绘画(开启|关闭)$',
+                    reg: '^(/|#)派蒙nai绘画(开启|关闭)$',
                     fnc: 'paimon_nai_turnOn',
                     permission: 'master'
                 },
                 {
-                    reg: '^#派蒙nai设置CD',
+                    reg: '^(/|#)派蒙nai设置CD',
                     fnc: 'paimon_nai_set_CD_all',
                     permission: 'master'
                 },
                 {
-                    reg: '^#派蒙nai设置每日次数限制',
+                    reg: '^(/|#)派蒙nai设置每日次数限制',
                     fnc: 'paimon_nai_set_usageLimit_day',
                     permission: 'master'
                 },
                 {
-                    reg: '^#派蒙nai(设置|删除)无限制人员(QQ|qq)',
+                    reg: '^(/|#)派蒙nai(设置|删除)无限制人员(QQ|qq)',
                     fnc: 'paimon_nai_set_unlimited_users',
                     permission: 'master'
                 },
-                // {
-                //     reg: '^#派蒙nai删除无限制人员(QQ|qq)',
-                //     fnc: 'paimon_nai_del_unlimited_users',
-                //     permission: 'master'
-                // },
                 {
-                    reg: '^#派蒙nai查看无限制人员(QQ|qq)$',
+                    reg: '^(/|#)派蒙nai查看无限制人员(QQ|qq)$',
                     fnc: 'paimon_nai_unlimited_users_lists',
                     permission: 'master'
                 },
                 {
-                    reg: '^#派蒙nai增加(QQ|qq)?([0-9]*)次数([0-9]*)(次)?',
+                    reg: '^(/|#)派蒙nai增加(QQ|qq)?([0-9]*)次数([0-9]*)(次)?',
                     fnc: 'paimon_nai_add_usageLimit_today',
                     permission: 'master'
                 },
                 {
-                    reg: '^#派蒙nai清空队列$',
+                    reg: '^(/|#)派蒙nai清空队列$',
                     fnc: 'paimon_nai_clearNaiQueue',
                     permission: 'master'
                 },
                 {
-                    reg: '^#派蒙nai设置鉴黄阈值',
+                    reg: '^(/|#)派蒙nai设置鉴黄阈值',
                     fnc: 'paimon_nai_setTh',
                     permission: 'master'
                 },
                 {
-                    reg: '^#派蒙nai设置鉴黄开关',
+                    reg: '^(/|#)派蒙nai设置鉴黄开关',
                     fnc: 'paimon_nai_setThOn',
                     permission: 'master'
                 },
                 {
-                    reg: '^#派蒙nai添加违禁词',
+                    reg: '^(/|#)派蒙nai添加违禁词',
                     fnc: 'paimon_nai_addUnsafeTag',
                     permission: 'master'
                 },
                 {
-                    reg: '^#解析(png|PNG)?$',
+                    reg: '^(/|#)解析(png|PNG)?$',
                     fnc: 'getPngInfo',
                 },
                 {
-                    reg: '^#鉴赏(png|PNG)?$',
+                    reg: '^(/|#)鉴赏(png|PNG)?$',
                     fnc: 'getAppreciate',
                 },
             ]

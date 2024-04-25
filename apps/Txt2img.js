@@ -2,6 +2,14 @@ import plugin from '../../../lib/plugins/plugin.js'
 import { handleParam } from '../utils/parse.js'
 import { url2Base64 } from '../utils/utils.js'
 import queue from '../components/Queue.js'
+import moment from "moment";
+import {
+  checkUsageLimit_day,
+  readYaml,
+  addUsage,
+  clearCD,
+  Config_yaml
+} from '../utils/paimonNaiControl.js'
 
 export class txt2img extends plugin {
   constructor() {
@@ -27,8 +35,15 @@ export class txt2img extends plugin {
   async txt2img(e) {
     if (queue.list.length === 0) return e.reply('当前队列中的可用Token为空，请先添加Token/使用【#刷新Token】指令刷新已经配置的Token')
 
-
-    // 判断个人CD---------------------------------------------------------    
+    // 读取config_yaml----------------------------------------------------
+    let config_yaml = readYaml(Config_yaml)
+    if (!config_yaml) logger.error('无法读取config_yaml')
+    if (!config_yaml.paimon_nai_turnOn) return
+    let cd_time = config_yaml.CD_all
+    let usageLimit_day = await checkUsageLimit_day(e.user_id, 0)
+    let nai_unlimited_users = config_yaml.nai_unlimited_users
+    let currentTime = moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
+    // 判断个人CD  
     let lastTime = await redis.get(`Yz:PaimongNai:${e.group_id}:${e.user_id}`);
     if (lastTime && !e.isMaster && nai_unlimited_users.indexOf(e.user_id) == -1) {
       let seconds = moment(currentTime).diff(moment(lastTime), "seconds");
@@ -38,7 +53,7 @@ export class txt2img extends plugin {
       }
       return await e.reply(`${cd_time}秒个人cd，请等待${cd_time - seconds}秒后再使用`, false, { recallMsg: 15 });
     }
-    // 判断次数限制--------------------------------------------------------
+    // 判断次数限制
     let usageLimit = e.isMaster || nai_unlimited_users.indexOf(e.user_id) > -1 ? 0 : usageLimit_day;
     let used = await redis.get(`Yz:PaimongNai:Usage:${e.user_id}`) || 0;
     let remainingTimes = usageLimit - used;//今日剩余次数
@@ -59,30 +74,22 @@ export class txt2img extends plugin {
           await common.sleep(1000)
           //await e.group.muteMember(e.user_id, 60 * 2);
           await common.sleep(5000)
-          return await e.reply(`包含敏感词汇:${nsfwmatch[0]} `,false, { recallMsg: 60 }); //${nsfwmatch[0]}
-        }
-      }
-      else {
-        const nsfwpattern = /without clothes|no clothes|no cloth|sex,|nude|naked|pussy|nsfw|nipple|nipples|penis|anal|anus|clitoris|labia|urethra|topless|bottomless|bareback|threesome|69|multiple_insertions|triple_penetration|incest|paizuri|nipples|nipple_piercing|areolae|asian|bestiality|artificial_vagina|missionary|stwincest|dildo|cum_inside|panties_around_one_leg|spreader_bar|shaved_pussy|spitroast|futanari|double_penetration|double_vaginal|double_anal|hairjob|oral|fellatio|gag,|vore|gokkun|breast_sucking|nipple_suck|lactation|nipple_pull|breast_feeding|tally|facesitting|virgin|multiple_paizuri|puffy_nipples|huge_ass|girl_on_top|reverse_cowgirl|cowgirl_position|nyotaimori|femdom|pegging|cervix|slave|leash|wide_hips|ejaculation|cum_on_hair|cum_on_food|about_to_be_raped|censored|small_nipples|cum_on_breast|cock_ring|large_insertion|penetration|rape|happy_sex|mind_control|grinding|molestation|suspension|no shirt|pregnancy|pregnant|vagina|areola|bondage|bdsm/i;
-        const nsfwmatch   = nsfwpattern.exec(e.msg);
-        if (nsfwmatch) {
-          await common.sleep(1000)
-          await e.group.muteMember(e.user_id, 60 * 2);
-          await common.sleep(5000)
-          return await e.reply(`包含内部敏感词汇: `,false, { recallMsg: 60 });
+          return await e.reply(`┭┮﹏┭┮不能再画涩涩的相片了:${nsfwmatch[0]} `,false, { recallMsg: 60 }); //${nsfwmatch[0]}
         }
       }
       // 非master不允许修改步数
       const pattern = /步数\s?(\d+)|(\d{2,7})[\*×](\d{2,7})/i;
       const match = pattern.exec(e.msg);
       if (match) {
-        return await e.reply(`注意！${e.user_id}尝试修改绘画参数，触发类型“${match[0]}”，已被中断，有需要请找管理员。`);
+        return await e.reply(`${e.user_id}┭┮﹏┭┮不能修改绘画参数“${match[0]}”`);
       }
     }
     e = await parseSourceImg(e)
     // END ---------------------------------------------------------
 
-    let msg = e.msg.replace(/^\/绘画|^\/画图|^#绘画|^#画图/, '')
+
+
+    let msg = e.msg.replace(/^\/绘画|^\/画图|^#绘画|^#画图|^nai3/, '')
     if (msg === '帮助') {
       return false
     }
@@ -102,7 +109,15 @@ export class txt2img extends plugin {
       user: e.user_id,
       type: 'txt2img'
     })
-    e.reply(`${param.parameters.reference_image ? '[已上传参考图片] ' : ''}当前队列还有${restNumber}人，大概还需要${14 * (restNumber + 1)}秒完成`, false, { recallMsg: 30 })
+    e.reply(`${param.parameters.reference_image ? '[已上传参考图片] ' : ''} ${e.user_id}今日剩余${remainingTimes}次，当前队列还有${restNumber}人，大概还需要${14 * (restNumber + 1)}秒完成`, false, { recallMsg: 30 })
+    
+    // 写入cd---------------------------------------------------------
+    currentTime = moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
+    redis.set(`Yz:PaimongNai:${e.group_id}:${e.user_id}`, currentTime, { EX: cd_time });
+    // 增加次数
+    addUsage(e.user_id, 1); 
+    // 写入cd END-----------------------------------------------------
+    
     return true
   }
 }

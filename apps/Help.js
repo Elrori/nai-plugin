@@ -44,7 +44,7 @@ export class help extends plugin {
                 "list": [
                     {
                         "icon": 1,
-                        "title": "/绘画",
+                        "title": "/绘画 或 nai3",
                         "desc": "根据用户输入的提示词生成图片"
                     },
                     {
@@ -74,8 +74,8 @@ export class help extends plugin {
                     },
                     {
                         "icon": 3,
-                        "title": "/审核图片",
-                        "desc": "对图片内容进行违规审核"
+                        "title": "/鉴赏 /解析",
+                        "desc": ""
                     },
                     {
                         "icon": 38,
