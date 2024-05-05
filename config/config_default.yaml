@@ -26,6 +26,7 @@ free_mode: true
 forward_msg: false
 paimon_nai_turnOn: true
 CD_all: 90
+nsfw_group: ""
 usageLimit_day: 5
 nai_unlimited_users:
   - 123

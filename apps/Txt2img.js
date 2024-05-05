@@ -39,7 +39,8 @@ export class txt2img extends plugin {
     let config_yaml = readYaml(Config_yaml)
     if (!config_yaml) logger.error('无法读取config_yaml')
     if (!config_yaml.paimon_nai_turnOn) return
-    let cd_time = config_yaml.CD_all
+    let cd_time    = config_yaml.CD_all
+    let nsfwgroup  = config_yaml.nsfw_group
     let usageLimit_day = await checkUsageLimit_day(e.user_id, 0)
     let nai_unlimited_users = config_yaml.nai_unlimited_users
     let currentTime = moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
@@ -64,7 +65,7 @@ export class txt2img extends plugin {
         return await e.reply(`你今天已经绘制过${used}张图片了，请明天再来~`, false, { recallMsg: 15 });
     }
     // 根据设置判断用户能否更改绘图参数/违禁词判断
-    if (!e.isMaster) {
+    if (!e.isMaster && e.group_id!=nsfwgroup) {
       // 非master不允许使用敏感TAG
       let data = readYaml(Config_yaml)
       if (data.nai_unsafewords) {
