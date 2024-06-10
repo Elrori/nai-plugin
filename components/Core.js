@@ -99,7 +99,7 @@ const defaultParam = {
       "noise_schedule": "native", // 噪点调度
       "params_version": 1, // 参数版本
       "seed": 3032217268, // 随机种子
-      "negative_prompt": "nsfw, lowres, {bad}, error, fewer, extra, missing, worst quality, jpeg artifacts, bad quality, watermark, unfinished, displeasing, chromatic aberration, signature, extra digits, artistic error, username, scan, [abstract], [ nai-plugin-branch:github.com/elrori/nai-plugin ]" // 反向提示词
+      "negative_prompt": "big belly, fat belly, nsfw, lowres, {bad}, error, fewer, extra, missing, worst quality, jpeg artifacts, bad quality, watermark, unfinished, displeasing, chromatic aberration, signature, extra digits, artistic error, username, scan, [abstract], [ nai-plugin-branch:github.com/elrori/nai-plugin ]" // 反向提示词
     }
   },
   "img2img": {
@@ -133,7 +133,7 @@ const defaultParam = {
       "params_version": 1, // 参数版本
       "seed": 3263049076, // 随机种子
       "extra_noise_seed": 3263049076,
-      "negative_prompt": "nsfw, lowres, {bad}, error, fewer, extra, missing, worst quality, jpeg artifacts, bad quality, watermark, unfinished, displeasing, chromatic aberration, signature, extra digits, artistic error, username, scan, [abstract], [ nai-plugin-branch:github.com/elrori/nai-plugin ]" // 反向提示词
+      "negative_prompt": "big belly, fat belly, nsfw, lowres, {bad}, error, fewer, extra, missing, worst quality, jpeg artifacts, bad quality, watermark, unfinished, displeasing, chromatic aberration, signature, extra digits, artistic error, username, scan, [abstract], [ nai-plugin-branch:github.com/elrori/nai-plugin ]" // 反向提示词
     }
   }
 }

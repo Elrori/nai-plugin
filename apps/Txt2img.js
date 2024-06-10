@@ -1,4 +1,5 @@
 import plugin from '../../../lib/plugins/plugin.js'
+import common from '../../../lib/common/common.js'
 import { handleParam } from '../utils/parse.js'
 import { url2Base64 } from '../utils/utils.js'
 import queue from '../components/Queue.js'
@@ -72,9 +73,8 @@ export class txt2img extends plugin {
         const nsfwpattern = new RegExp(data.nai_unsafewords, "i");
         const nsfwmatch   = nsfwpattern.exec(e.msg);
         if (nsfwmatch) {
-          await common.sleep(1000)
+          await common.sleep(3000)
           //await e.group.muteMember(e.user_id, 60 * 2);
-          await common.sleep(5000)
           return await e.reply(`┭┮﹏┭┮不能再画涩涩的相片了:${nsfwmatch[0]} `,false, { recallMsg: 60 }); //${nsfwmatch[0]}
         }
       }
