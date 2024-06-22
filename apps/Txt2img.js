@@ -25,7 +25,7 @@ export class txt2img extends plugin {
       rule: [
         {
           /** 命令正则匹配 */
-          reg: '^(/|#|n)(绘画|画图|ai3)([\\s\\S]*)$',
+          reg: '^(/|#)(绘画|画图)([\\s\\S]*)$',
           /** 执行方法 */
           fnc: 'txt2img'
         }
@@ -90,7 +90,7 @@ export class txt2img extends plugin {
 
 
 
-    let msg = e.msg.replace(/^\/绘画|^\/画图|^#绘画|^#画图|^nai3/, '')
+    let msg = e.msg.replace(/^\/绘画|^\/画图|^#绘画|^#画图/, '')
     if (msg === '帮助') {
       return false
     }
@@ -100,23 +100,34 @@ export class txt2img extends plugin {
       type: 'txt2img'
     };
     await redis.set(`nai:again:${e.user_id}`, JSON.stringify(data));
-    let param = await handleParam(e, msg)
-    if (e.img) {
-      param.parameters.reference_image = await url2Base64(e.img[0])
-    }
-    let restNumber = await queue.enqueue({
-      e: e,
-      param: param,
-      user: e.user_id,
-      type: 'txt2img'
-    })
-    e.reply(`${param.parameters.reference_image ? '[已上传参考图片] ' : ''} ${e.user_id}今日剩余${remainingTimes}次，当前队列还有${restNumber}人，大概还需要${14 * (restNumber + 1)}秒完成`, false, { recallMsg: 30 })
     
+    let nums = 1
+    if(e.renums){
+      nums = e.renums
+    }
+    for (let index = 0; index < nums; index++) {
+        let param = await handleParam(e, msg)
+        if (e.img) {
+          param.parameters.reference_image = await url2Base64(e.img[0])
+        }
+        let restNumber = await queue.enqueue({
+          e: e,
+          param: param,
+          user: e.user_id,
+          type: 'txt2img'
+        })
+        if (nums == 1) {
+            e.reply(`${param.parameters.reference_image ? '[已上传参考图片] ' : ''} ${e.user_id}今日剩余${remainingTimes}次，当前队列还有${restNumber}人，大概还需要${14 * (restNumber + 1)}秒完成`, false, { recallMsg: 30 })
+        }
+        else if (index == 0) {
+            e.reply(`批量绘图(${nums}张)，${param.parameters.reference_image ? '[已上传参考图片] ' : ''} ${e.user_id}今日剩余${remainingTimes}次，当前队列还有${restNumber}人，大概还需要${14 * (restNumber + 1)}秒完成`, false, { recallMsg: 30 })
+        }
+    }
     // 写入cd---------------------------------------------------------
     currentTime = moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
     redis.set(`Yz:PaimongNai:${e.group_id}:${e.user_id}`, currentTime, { EX: cd_time });
     // 增加次数
-    addUsage(e.user_id, 1); 
+    addUsage(e.user_id, nums); 
     // 写入cd END-----------------------------------------------------
     
     return true

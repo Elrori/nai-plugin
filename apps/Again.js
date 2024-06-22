@@ -19,7 +19,7 @@ export class again extends plugin {
             rule: [
                 {
                     /** 命令正则匹配 */
-                    reg: '^(/|#|r)(重画|e)([0-9]|)$',
+                    reg: '^(/|#|r)(重画|e)([0-9]*)(张|幅|次|)$',
                     /** 执行方法 */
                     fnc: 'again'
                 }
@@ -30,13 +30,22 @@ export class again extends plugin {
     async again(e) {
     
         // re feature-----------------------------------------
-        let input_v = e.msg.replace(/^#重画|re/, '').trim()
-        let input_num = parseInt(input_v)
-        let renums = 1
-        if (input_num && input_num <= 3 && input_num > 0) {
-            renums = input_num
+        let match = e.msg.trim().match(/^(#重画|\/重画|re)([0-9]*)(张|幅|次|)/)
+        if (match){
+            let input_num = parseInt(match[2])
+            if (input_num && input_num <= 3 && input_num > 0) {
+                e.renums = input_num
+            }
+            else {
+                e.renums = 1
+                if (input_num)
+                  e.reply("一次最多重画3张~");
+            }
         }
-        e.renums = renums
+        else {
+            logger.error('重画匹配异常')
+            return true
+        }
         // paimon_nai_turnOn
         let config_yaml = readYaml(Config_yaml)
         if (!config_yaml) logger.error('无法读取config_yaml')

@@ -367,13 +367,25 @@ export class paimonnaihelp extends plugin {
             const match1 = pnginfo.match(/"prompt"(.*)"steps":/m);
             const match2 = pnginfo.match(/"uc"(.*)"request_type":/m);
             const match3 = pnginfo.match(/"sm"(.*)"sm_dyn":(.*?),/m);
+            const match5 = pnginfo.match(/"sampler"(.*?),/m);
+            const match6 = pnginfo.match(/"scale"(.*?),/m);
+            const samplers = {
+                'k_euler_ancestral':'Euler a' ,
+                'k_euler':'Euler' ,
+                'k_dpmpp_2s_a':'DPM++ 2S a' ,
+                'k_dpmpp_2m':'DPM++ 2M' ,
+                'k_dpmpp_sde':'DPM++ SDE' ,
+                'ddim':'DDIM' ,
+            }
             if (match1){
                 let tags  = match1[0].replace(/"prompt": "|", "steps":|\\n/g, '').trim()
                 let ntags = 'ntags=' + match2[0].replace(/"uc": "|", "request_type":|\\n/g, '').trim()
                 let smea  = match3[0].replace(/"sm": |, "sm_dyn": (.*)|\\n/g, '').trim()
                 let dyn   = match3[0].replace(/"sm": (.*?), "sm_dyn": |,|\\n/g, '').trim()
-                let smea_dyn = 'smea: ' + smea + ', dyn: ' + dyn
-                return e.reply(await common.makeForwardMsg(e, [tags, ntags, smea_dyn, await segment.image(imgResponse.data)], `PNG文件信息解析`))
+                let sampler = match5[0].replace(/"sampler": |,|"|\\n/g, '').trim()
+                let scale = match6[0].replace(/"scale": |,|"|\\n/g, '').trim()
+                let misc  = '采样器: ' + samplers[sampler] + ', 引导强度: ' + scale + ', smea: ' + smea + ', dyn: ' + dyn
+                return e.reply(await common.makeForwardMsg(e, [tags, ntags, misc, await segment.image(imgResponse.data)], `PNG文件信息解析`))
             }
                 
             // 匹配SD
