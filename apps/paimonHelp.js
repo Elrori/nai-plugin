@@ -11,6 +11,7 @@ import {
     updateConfig,
     Config_yaml
 } from '../utils/paimonNaiControl.js'
+import { getStealthExif } from "../utils/utils.js";
 
 export class paimonnaihelp extends plugin {
     constructor() {
@@ -351,7 +352,6 @@ export class paimonnaihelp extends plugin {
     async getPngInfo(e) {
         e = await parseSourceImg(e)
         if (e.img) {
-            // let pnginfo = new TextDecoder().decode(e.img[0])
             const imgResponse = await axios.get(e.img[0], {
                 responseType: 'arraybuffer'
             });
@@ -360,15 +360,6 @@ export class paimonnaihelp extends plugin {
                 this.e.reply(`这图片超过50MB了，人家怕把自己干傻了，人家不干了！`)
                 return false
             }
-            let pnginfo = Buffer.from(imgResponse.data, 'binary')
-                .toString('utf8');
-
-            // 匹配nai3
-            const match1 = pnginfo.match(/"prompt"(.*)"steps":/m);
-            const match2 = pnginfo.match(/"uc"(.*)"request_type":/m);
-            const match3 = pnginfo.match(/"sm"(.*)"sm_dyn":(.*?),/m);
-            const match5 = pnginfo.match(/"sampler"(.*?),/m);
-            const match6 = pnginfo.match(/"scale"(.*?),/m);
             const samplers = {
                 'k_euler_ancestral':'Euler a' ,
                 'k_euler':'Euler' ,
@@ -377,6 +368,26 @@ export class paimonnaihelp extends plugin {
                 'k_dpmpp_sde':'DPM++ SDE' ,
                 'ddim':'DDIM' ,
             }
+            // 匹配nai3 透明度通道密文EXIF
+            let json = await getStealthExif(imgResponse.data)
+            if (json) {
+                let tags  = json.Description
+                let comment = JSON.parse(json.Comment)
+                let ntags = 'ntags=' + comment.uc
+                let refs  = comment.hasOwnProperty("reference_information_extracted_multiple") ? (comment.reference_information_extracted_multiple.length == 0 ? "无":"有"):"无"
+                let misc  = '采样器: ' + samplers[comment.sampler] + ', 引导强度: ' + comment.scale + ', smea: ' + comment.sm + ', dyn: ' + comment.sm_dyn + ', ' + refs + '参考图片, TAG数据来自于透明度通道'
+                let jsonstring = JSON.stringify(comment, undefined, 2)
+                return e.reply(await common.makeForwardMsg(e, [tags, ntags, misc, jsonstring, await segment.image(imgResponse.data)], `PNG文件信息解析`))
+            }
+
+            // 匹配nai3 明文EXIF
+            let pnginfo = Buffer.from(imgResponse.data, 'binary')
+                .toString('utf8');
+            const match1 = pnginfo.match(/"prompt"(.*)"steps":/m);
+            const match2 = pnginfo.match(/"uc"(.*)"request_type":/m);
+            const match3 = pnginfo.match(/"sm"(.*)"sm_dyn":(.*?),/m);
+            const match5 = pnginfo.match(/"sampler"(.*?),/m);
+            const match6 = pnginfo.match(/"scale"(.*?),/m);
             if (match1){
                 let tags  = match1[0].replace(/"prompt": "|", "steps":|\\n/g, '').trim()
                 let ntags = 'ntags=' + match2[0].replace(/"uc": "|", "request_type":|\\n/g, '').trim()
@@ -387,7 +398,7 @@ export class paimonnaihelp extends plugin {
                 let misc  = '采样器: ' + samplers[sampler] + ', 引导强度: ' + scale + ', smea: ' + smea + ', dyn: ' + dyn
                 return e.reply(await common.makeForwardMsg(e, [tags, ntags, misc, await segment.image(imgResponse.data)], `PNG文件信息解析`))
             }
-                
+        
             // 匹配SD
             const match4 = pnginfo.match(/parameters.*/m);
             if (match4) {

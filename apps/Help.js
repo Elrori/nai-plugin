@@ -44,8 +44,8 @@ export class help extends plugin {
                 "list": [
                     {
                         "icon": 1,
-                        "title": "/绘画 或 nai3",
-                        "desc": "根据用户输入的提示词生成图片"
+                        "title": "/绘画",
+                        "desc": "根据用户输入的提示词生成图片，引用已有图片进行风格迁移"
                     },
                     {
                         "icon": 5,
@@ -75,7 +75,7 @@ export class help extends plugin {
                     {
                         "icon": 3,
                         "title": "/鉴赏 /解析",
-                        "desc": ""
+                        "desc": "使用DeepDanbooru反推图片TAG / 解析原始图片TAG信息"
                     },
                     {
                         "icon": 38,

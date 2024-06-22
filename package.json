@@ -10,11 +10,13 @@
   "module": "index.js",
   "dependencies": {
     "@gradio/client": "^0.2.1",
-    "axios": "^1.6.2",
     "adm-zip": "^0.5.10",
-    "https-proxy-agent": "^7.0.2",
+    "axios": "^1.6.2",
     "cos-nodejs-sdk-v5": "^2.13.3",
-    "form-data": "^4.0.0"
+    "form-data": "^4.0.0",
+    "https-proxy-agent": "^7.0.2",
+    "pako": "^2.1.0",
+    "sharp": "^0.32.3"
   },
   "keywords": [
     "Yunzai-Bot",
